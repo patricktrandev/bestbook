@@ -1,20 +1,17 @@
 import React from "react";
 
 import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./layouts/NavbarAndFooter/Navbar";
-import ExploreTopBook from "./layouts/HomePage/ExploreTopBook";
-import Carousel from "./layouts/HomePage/Carousel";
-import Heroes from "./layouts/HomePage/Heroes";
-import LibraryServices from "./layouts/HomePage/LibraryServices";
+import Footer from "./layouts/NavbarAndFooter/Footer";
+import HomePage from "./layouts/HomePage/HomePage";
 
 function App() {
   return (
     <div>
       <Navbar />
-      <ExploreTopBook />
-      <Carousel />
-      <Heroes />
-      <LibraryServices />
+      <HomePage />
+      <Footer />
     </div>
   );
 }
