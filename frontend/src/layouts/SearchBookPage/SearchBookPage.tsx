@@ -12,10 +12,19 @@ export const SearchBookPage = () => {
   const [booksPerPage] = useState(5);
   const [totalAmountOfBooks, setTotalAmountOfBooks] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [searchKey, setSearchKey] = useState("");
+  const [searchUrl, setSearchUrl] = useState("");
   useEffect(() => {
     const fetchBook = async () => {
       const baseUrl = "http://localhost:8080/api/books";
-      const url = `${baseUrl}?page=${currentPage - 1}&size=${booksPerPage}`;
+      let url = `${baseUrl}?page=${currentPage - 1}&size=${booksPerPage}`;
+
+      if (searchUrl === "") {
+        url = `${baseUrl}?page=${currentPage - 1}&size=${booksPerPage}`;
+      } else {
+        url = baseUrl + searchUrl;
+      }
+
       const res = await fetch(url);
       console.log(res);
       if (!res.ok) console.log("Something went wrong!");
@@ -49,7 +58,7 @@ export const SearchBookPage = () => {
       setHttpError(err.message);
     });
     window.scrollTo(0, 0);
-  }, [currentPage]);
+  }, [currentPage, searchUrl]);
   if (isLoading) {
     return <SpinnerLoading />;
   }
@@ -60,7 +69,26 @@ export const SearchBookPage = () => {
       </div>
     );
   }
-  console.log("here", books);
+
+  const handleSearchChange = () => {
+    console.log(searchKey);
+    if (searchKey === "") {
+      setSearchUrl("");
+    } else {
+      setSearchUrl(
+        `/search/findByTitleContaining?title=${searchKey}&page=${
+          currentPage - 1
+        }&size=${booksPerPage}`
+      );
+      console.log(searchUrl);
+    }
+  };
+
+  const handleClearKeySearch = () => {
+    setSearchKey("");
+    setSearchUrl("");
+  };
+
   const indexOfLastBookInCurrentPage: number = currentPage * booksPerPage;
   const indexOfFirstBookInCurrentPage: number =
     indexOfLastBookInCurrentPage - booksPerPage;
@@ -80,8 +108,21 @@ export const SearchBookPage = () => {
               type="search"
               placeholder="Search book title, category,..."
               aria-labelledby="Search"
+              value={searchKey}
+              onChange={(e) => setSearchKey(e.target.value)}
             />
-            <button className="btn btn-outline-success">Search</button>
+            <button
+              className="btn btn-outline-success"
+              onClick={() => handleSearchChange()}
+            >
+              Search
+            </button>
+            <button
+              className="btn btn-outline-warning mx-2"
+              onClick={() => handleClearKeySearch()}
+            >
+              Clear
+            </button>
           </div>
         </div>
         <div className="col-4">
@@ -125,25 +166,36 @@ export const SearchBookPage = () => {
           </div>
         </div>
       </div>
-      <div className="mt-3">
-        <h5>Number of results: {totalAmountOfBooks}</h5>
-      </div>
-      <p>
-        {indexOfFirstBookInCurrentPage + 1} to{" "}
-        {indexOfLastBookInCurrentPage > totalAmountOfBooks
-          ? totalAmountOfBooks
-          : indexOfLastBookInCurrentPage}{" "}
-        of {totalAmountOfBooks} items
-      </p>
-      {books.map((b) => (
-        <SearchBook book={b} key={b.id} />
-      ))}
-      {totalPages > 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          paginate={paginate}
-        />
+      {totalAmountOfBooks > 0 ? (
+        <>
+          <div className="mt-3">
+            <h5>Number of results: {totalAmountOfBooks}</h5>
+          </div>
+          <p>
+            {indexOfFirstBookInCurrentPage + 1} to{" "}
+            {indexOfLastBookInCurrentPage > totalAmountOfBooks
+              ? totalAmountOfBooks
+              : indexOfLastBookInCurrentPage}{" "}
+            of {totalAmountOfBooks} items
+          </p>
+          {books.map((b) => (
+            <SearchBook book={b} key={b.id} />
+          ))}
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              paginate={paginate}
+            />
+          )}
+        </>
+      ) : (
+        <div className="m-5">
+          <h3>Can't find what you're looking for?</h3>
+          <a href="#" className="btn btn-primary px-4 me-md-2 fw-bold ">
+            Library Services
+          </a>
+        </div>
       )}
     </div>
   );
