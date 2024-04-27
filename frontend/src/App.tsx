@@ -7,6 +7,7 @@ import Footer from "./layouts/NavbarAndFooter/Footer";
 import HomePage from "./layouts/HomePage/HomePage";
 import { SearchBookPage } from "./layouts/SearchBookPage/SearchBookPage";
 import { Redirect, Route, Switch } from "react-router";
+import { BookCheckoutPage } from "./layouts/BookCheckout/BookCheckoutPage";
 
 function App() {
   return (
@@ -22,6 +23,9 @@ function App() {
           </Route>
           <Route path="/search" exact>
             <SearchBookPage />
+          </Route>
+          <Route path="/checkout/:bookId">
+            <BookCheckoutPage />
           </Route>
         </Switch>
       </div>
