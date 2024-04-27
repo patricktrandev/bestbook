@@ -14,6 +14,7 @@ export const SearchBookPage = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [searchKey, setSearchKey] = useState("");
   const [searchUrl, setSearchUrl] = useState("");
+  const [categorySelection, setCategorySelection] = useState("Book Category");
   useEffect(() => {
     const fetchBook = async () => {
       const baseUrl = "http://localhost:8080/api/books";
@@ -22,7 +23,11 @@ export const SearchBookPage = () => {
       if (searchUrl === "") {
         url = `${baseUrl}?page=${currentPage - 1}&size=${booksPerPage}`;
       } else {
-        url = baseUrl + searchUrl;
+        let searchWithPage = searchUrl.replace(
+          "<pageNumber>",
+          `${currentPage}-1`
+        );
+        url = baseUrl + searchWithPage;
       }
 
       const res = await fetch(url);
@@ -71,22 +76,41 @@ export const SearchBookPage = () => {
   }
 
   const handleSearchChange = () => {
-    console.log(searchKey);
+    setCurrentPage(1);
+    //console.log(searchKey);
     if (searchKey === "") {
       setSearchUrl("");
     } else {
       setSearchUrl(
-        `/search/findByTitleContaining?title=${searchKey}&page=${
-          currentPage - 1
-        }&size=${booksPerPage}`
+        `/search/findByTitleContaining?title=${searchKey}&page=<pageNumber>&size=${booksPerPage}`
       );
-      console.log(searchUrl);
+      //console.log(searchUrl);
     }
+    setCategorySelection("Book Category");
   };
 
   const handleClearKeySearch = () => {
     setSearchKey("");
     setSearchUrl("");
+    setCurrentPage(1);
+    setCategorySelection("Book Category");
+  };
+
+  const handleSearchCategory = (value: string) => {
+    if (
+      value.toLowerCase() === "fe" ||
+      value.toLowerCase() === "be" ||
+      value.toLowerCase() === "data" ||
+      value.toLowerCase() === "devops"
+    ) {
+      setCategorySelection(value);
+      setSearchUrl(
+        `/search/findByCategory?category=${value.toLowerCase()}&page=<pageNumber>&size=${booksPerPage}`
+      );
+    } else {
+      setCategorySelection("All");
+      setSearchUrl("");
+    }
   };
 
   const indexOfLastBookInCurrentPage: number = currentPage * booksPerPage;
@@ -134,30 +158,30 @@ export const SearchBookPage = () => {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Category
+              {categorySelection}
             </button>
             <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-              <li>
+              <li onClick={() => handleSearchCategory("All")}>
                 <a className="dropdown-item" href="#">
                   All
                 </a>
               </li>
-              <li>
+              <li onClick={() => handleSearchCategory("FE")}>
                 <a className="dropdown-item" href="#">
                   Front End
                 </a>
               </li>
-              <li>
+              <li onClick={() => handleSearchCategory("BE")}>
                 <a className="dropdown-item" href="#">
                   Back End
                 </a>
               </li>
-              <li>
+              <li onClick={() => handleSearchCategory("Data")}>
                 <a className="dropdown-item" href="#">
                   Data
                 </a>
               </li>
-              <li>
+              <li onClick={() => handleSearchCategory("Devops")}>
                 <a className="dropdown-item" href="#">
                   DevOps
                 </a>
@@ -172,7 +196,12 @@ export const SearchBookPage = () => {
             <h5>Number of results: {totalAmountOfBooks}</h5>
           </div>
           <p>
-            {indexOfFirstBookInCurrentPage + 1} to{" "}
+            {`${
+              indexOfFirstBookInCurrentPage >= totalAmountOfBooks
+                ? ` 1 `
+                : indexOfFirstBookInCurrentPage + 1
+            } `}
+            to{" "}
             {indexOfLastBookInCurrentPage > totalAmountOfBooks
               ? totalAmountOfBooks
               : indexOfLastBookInCurrentPage}{" "}
