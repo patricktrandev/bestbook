@@ -6,13 +6,26 @@ import Navbar from "./layouts/NavbarAndFooter/Navbar";
 import Footer from "./layouts/NavbarAndFooter/Footer";
 import HomePage from "./layouts/HomePage/HomePage";
 import { SearchBookPage } from "./layouts/SearchBookPage/SearchBookPage";
+import { Redirect, Route, Switch } from "react-router";
 
 function App() {
   return (
-    <div>
+    <div className="d-flex flex-column min-vh-100">
       <Navbar />
-      <SearchBookPage />
-      {/* <HomePage /> */}
+      <div className="flex-grow-1">
+        <Switch>
+          <Route path="/" exact>
+            <Redirect to="/home" />
+          </Route>
+          <Route path="/home" exact>
+            <HomePage />
+          </Route>
+          <Route path="/search" exact>
+            <SearchBookPage />
+          </Route>
+        </Switch>
+      </div>
+
       <Footer />
     </div>
   );
