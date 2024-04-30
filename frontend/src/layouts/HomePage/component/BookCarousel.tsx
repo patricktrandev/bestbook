@@ -4,6 +4,7 @@ import { Carousel } from "react-bootstrap";
 import BookModel from "../../../models/BookModel";
 import { ReturnBook } from "./ReturnBook";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
+import { Link } from "react-router-dom";
 export default function BookCarousel() {
   const [books, setBooks] = useState<BookModel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -100,9 +101,13 @@ export default function BookCarousel() {
         </div>
       )}
       <div className="homepage-carousel-title mt-3">
-        <a type="button" className="btn btn-outline-secondary btn-lg" href="#">
+        <Link
+          type="button"
+          className="btn btn-outline-secondary btn-lg"
+          to="/search"
+        >
           View more
-        </a>
+        </Link>
       </div>
     </div>
   );
