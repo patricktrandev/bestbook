@@ -4,13 +4,20 @@ import BookModel from "../../models/BookModel";
 import { SpinnerLoading } from "../Utils/SpinnerLoading";
 import { StarReviews } from "../Utils/StarReviews";
 import { CheckoutAndReviewBox } from "./CheckoutAndReviewBox";
+import ReviewModel from "../../models/ReviewModel";
+import { LatestReview } from "./LatestReview";
 
 export const BookCheckoutPage = () => {
   const [book, setBook] = useState<BookModel>();
   const [isLoading, setIsLoading] = useState(true);
   const [httpError, setHttpError] = useState();
 
-  const bookId = window.location.pathname.split("/")[2];
+  //review state
+  const [review, setReview] = useState<ReviewModel[]>([]);
+  const [isLoadingReview, setIsLoadingReview] = useState(true);
+  const [totalStar, setTotalStar] = useState(0);
+
+  const bookId = Number(window.location.pathname.split("/")[2]);
 
   useEffect(() => {
     const fetchSingleBook = async () => {
@@ -45,7 +52,42 @@ export const BookCheckoutPage = () => {
     });
   }, []);
 
-  if (isLoading) {
+  useEffect(() => {
+    const fetchReview = async () => {
+      let reviewUrl = `http://localhost:8080/api/reviews/search/findBookById?bookId=${bookId}`;
+      let response = await fetch(reviewUrl);
+      if (!response.ok) {
+        throw new Error("Something went wrong!");
+      }
+      let resJson = await response.json();
+      let resData = resJson._embedded.reviews;
+      let loadedReview: ReviewModel[] = [];
+      let weightedRating: number = 0;
+      for (let key in resData) {
+        loadedReview.push({
+          id: resData[key].id,
+          userEmail: resData[key].userEmail,
+          date: resData[key].date,
+          rating: resData[key].rating,
+          bookId: resData[key].bookId,
+          reviewDescription: resData[key].reviewDescription,
+        });
+        weightedRating += resData[key].rating;
+      }
+      setReview(loadedReview);
+      weightedRating = Number(
+        (((weightedRating / loadedReview.length) * 2) / 2).toFixed(1)
+      );
+      setTotalStar(weightedRating);
+      setIsLoadingReview(false);
+    };
+    fetchReview().catch((err: any) => {
+      setIsLoadingReview(false);
+      setHttpError(err.message);
+    });
+  }, []);
+
+  if (isLoading || isLoadingReview) {
     return <SpinnerLoading />;
   }
   if (httpError) {
@@ -56,6 +98,7 @@ export const BookCheckoutPage = () => {
     );
   }
   //console.log(book);
+  console.log(review);
   return (
     <div>
       <div className="container d-none d-lg-block">
@@ -79,12 +122,13 @@ export const BookCheckoutPage = () => {
               <p className="lead" style={{ fontSize: "1.1rem" }}>
                 {book?.description}
               </p>
-              <StarReviews rating={3} size={32} />
+              <StarReviews rating={totalStar} size={32} />
             </div>
           </div>
           <CheckoutAndReviewBox book={book} mobile={false} />
         </div>
         <hr />
+        <LatestReview reviews={review} bookId={bookId} mobile={false} />
       </div>
       {/*mobile*/}
       <div className="container d-lg-none mt-5">
@@ -112,6 +156,7 @@ export const BookCheckoutPage = () => {
         </div>
         <CheckoutAndReviewBox book={book} mobile={true} />
         <hr />
+        <LatestReview reviews={review} bookId={bookId} mobile={true} />
       </div>
     </div>
   );
