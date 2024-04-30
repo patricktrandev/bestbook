@@ -22,7 +22,7 @@ export const CheckoutAndReviewBox: React.FC<{
           {props.book &&
           props.book.copiesAvailable &&
           props.book.copiesAvailable > 0 ? (
-            <h4 className="text-success">Available</h4>
+            <h5 className="text-success">Available</h5>
           ) : (
             <h4 className="text-danger">Waiting List</h4>
           )}
@@ -35,7 +35,7 @@ export const CheckoutAndReviewBox: React.FC<{
             </p>
           </div>
         </div>
-        <Link to="/#" className="btn btn-success btn-lg">
+        <Link to="/#" className="btn btn-success btn-md">
           Sign In
         </Link>
         <hr />

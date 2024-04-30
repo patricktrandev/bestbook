@@ -74,7 +74,7 @@ export const BookCheckoutPage = () => {
           </div>
           <div className="col-4 col-md-4 container">
             <div className="ml-2">
-              <h2>{book?.title}</h2>
+              <h3>{book?.title}</h3>
               <h5 className="text-primary">{book?.author}</h5>
               <p className="lead" style={{ fontSize: "1.1rem" }}>
                 {book?.description}
